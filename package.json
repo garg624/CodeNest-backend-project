@@ -1,0 +1,20 @@
+{
+  "name": "new-backend",
+  "version": "1.0.0",
+  "description": "this project is to learn the backend ",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "backend-project"
+  },
+  "author": "ayush garg",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.4"
+  }
+}

@@ -35,3 +35,9 @@ second file: .prettierignore file
 it define the prettier to not touch the listed files.
 
 
+## How to use env variables in your other files
+* install it
+* syntax1: require("dotenv").config({path: "./env"})
+* syntax2: >import dotenv from "dotenv";
+            dotenv.config({path: "./env"})
+            change the dev command to "nodemon -r dotenv/config --experimental-json-modules src/index.js"

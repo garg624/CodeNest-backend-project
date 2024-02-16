@@ -64,3 +64,21 @@ describing the point in the code at which the Error was instantiated.
    at increaseSynergy (/home/gbusey/actors.js:701:6)
 # what is Error.captureStackTrace(targetObject[, constructorOpt])
 Creates a .stack property on targetObject, which when accessed returns a string representing the location in the code at which Error.captureStackTrace() was called.
+
+
+# mongoose has the feature to add some middleware between the database and the backend.
+like mongoose.pre is a middleware which can perform some task 
+Example : encryption of the password.
+
+# bcrypt VS bcryptjs
+> both are almost same o only bcrypt is maded from the nodejs and bcryptjs is from the plain javascript and has no dependencies.
+
+
+# what is the use of the bcrypt pakage .
+> used to encrypt the password and check if the password is correct.
+
+# what is the use of the jsonwebtoken
+> create a token with the encrypted field and have some important functions to create the different token.And work as the key to access the database.
+
+
+#

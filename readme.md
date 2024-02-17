@@ -80,5 +80,15 @@ Example : encryption of the password.
 # what is the use of the jsonwebtoken
 > create a token with the encrypted field and have some important functions to create the different token.And work as the key to access the database.
 
+# what is fs?
+fs is a file system.hepls to readd write ect or open or close the folders.
+>fs.unlink is function to delete the file.
+>fs.unlinksync force to delete the files.
 
-#
+
+# MULTER
+uplooad the file to the public temp folder from where we can upload it to the cloudinary.
+
+# What is the use of cloudinary in this project?
+upload the file from the public/temp folder and get the url so that we can store it to the database.
+

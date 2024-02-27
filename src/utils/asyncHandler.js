@@ -1,12 +1,17 @@
 // * anothere apporach to makr the async handler
+// ?When you call the next function, you are essentially saying, "Hey, I'm done with my part of the request-response cycle. Now it's time for the next middleware function to handle the request."
+
+
 const asyncHandler = (requestHandler) => {
-    (req, res, next) => {
+    return (req, res, next) => {
         Promise
         .resolve(requestHandler(req, res, next))
         .catch((error) => { next(error) });
     }
 }
 export {asyncHandler}
+
+
 // * is you want to use .then - then takes the callback function and executes the function in the callback body
 
 

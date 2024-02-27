@@ -92,3 +92,18 @@ uplooad the file to the public temp folder from where we can upload it to the cl
 # What is the use of cloudinary in this project?
 upload the file from the public/temp folder and get the url so that we can store it to the database.
 
+#       Some things about HTTP.
+URI=universal resourse identifier
+meta data : data about data.
+
+
+## http methods
+* Get : retreive the data.
+* head
+* options : available operations.
+* trace : debugging its a loop.
+* delete : remove the data
+* put:fully replace the data
+* post:same as get with security.
+* patch
+

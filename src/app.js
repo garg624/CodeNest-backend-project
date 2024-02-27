@@ -1,3 +1,5 @@
+// !in app file we imports most of the things like routes and controllers etc rather than writting the whole code here
+
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
@@ -21,7 +23,16 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 // to store the pdf,images , csv's etc
 app.use(express.static("public"))
 
-
+// 
 // cookies parser used to handle the cookies
 app.use(cookieParser());
+
+//? all the route are handled here.
+
+import userRouter from "./routes/user.route.js"
+
+app.use("/api/v1/users",userRouter);
+
+
+
 export {app}

@@ -1,3 +1,4 @@
+// !in production grade code we have to leave the index file for the configurations only.
 import connectDB from "./db/index.js";
 import dotenv from "dotenv";
 import { app} from "./app.js";

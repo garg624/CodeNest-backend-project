@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
             required: true,
             unique: true
         },
-        fullname: {
+        fullName: {
             type: String,
             index: true,// * this is only used to optamize the searching of the field
             trim: true, // * any leading or trailing white spaces are removed.
@@ -67,7 +67,7 @@ const userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
 
-    this.password = bcrypt.hash(this.password, 10);// ? here is the salt or we can say that the number of rounds to encrypt the password.
+    this.password =await bcrypt.hash(this.password, 10);// ? here is the salt or we can say that the number of rounds to encrypt the password.
     next();
 })
 

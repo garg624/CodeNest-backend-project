@@ -1,7 +1,9 @@
 class ApiError extends Error {
     constructor(statusCode,message,errors=[],stack=""){
         super(message);
+
         // * Nulling the value of this.data is a good practice that can help to prevent memory leaks, make Error objects more reusable, and protect sensitive data.
+        
         this.data=null
         this.message=message
         this.statusCode=statusCode
@@ -20,3 +22,10 @@ class ApiError extends Error {
     }
 }
 export {ApiError};
+
+// ? method to call this function or method 
+//* const apiError = new ApiError(400, "Invalid input", [
+// *    { field: "email", message: "Invalid email address" },
+// *    { field: "password", message: "Password must be at least 8 characters long" },
+// *  ]);
+//  * console.log(apiError);

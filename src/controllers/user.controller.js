@@ -1,6 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import {User} from "../models/sanptube/user.model.js";
-import {ApiError} from "../utils/ApiError.js"
+import { User } from "../models/sanptube/user.model.js";
+import { ApiError } from "../utils/ApiError.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 // here doesn't matter you use return keyword or not.
@@ -21,9 +21,9 @@ const registerUser = asyncHandler(async (req, res) => {
     const avatarPath = req.files?.avatar[0].path;
     //? we are hadling if the avatar file is received or not but we are not checking coverimage
     let coverImagePath;
-    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
-         coverImagePath = req.files?.coverImage;
-        
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImagePath = req.files?.coverImage;
+
     }
 
 
@@ -60,4 +60,100 @@ const registerUser = asyncHandler(async (req, res) => {
         new ApiResponse(200, userSavedDetails, "User registered sucessfully")
     )
 })
-export { registerUser };
+
+
+const loginUser = asyncHandler(async (req, res) => {
+    // todos:
+    //* get the email and password from req.body
+    //* create a functionalty where user can login with username or email.
+    //* validations
+    //* check if the email is present or not 
+    //* if present compare the password with bcrypt
+    //* send the access token and send the refersh token
+    //* send the verification token
+    //* use cookies to send the refresh token
+    //* return the response of successfull login
+
+    const { email, password, username } = req.body
+    console.log("req.body ----- ",req.body)
+    if (!email && !username) {
+        throw new ApiError(400, "Email or username are must.")
+    }
+    const userExist = await User.findOne({ $or: [{ email }, { username }] })
+
+    if (!userExist) {
+        throw new ApiError(400, "User does not exist . Register first")
+    }
+    console.log("user's id : ", userExist._id);
+
+    const isPasswordValid = await userExist.isPasswordCorrect(password)
+
+    if (!isPasswordValid) {
+        throw new ApiError(400, 'Invalid Password')
+    }
+
+    const refreshToken = await userExist.generateRefreshToken();
+    userExist.refreshToken = refreshToken;
+    //* we will save this token in the secured cookies.
+    const accessToken = await userExist.generateAccessToken();
+
+    const savedUser = await userExist.save();
+    console.log(savedUser);
+
+    // now setup the cookies
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+
+    return res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user:{ refreshToken, accessToken, savedUser}                },
+                "Login successfull"
+            )
+        )
+
+
+})
+
+const logoutUser = asyncHandler(async (req, res) => {
+    //todos:
+    //* get the refresh and access token form the cookies--create a middlware for that.
+    //* then extract _id from the token 
+    //* find the user on the user of _id
+    //* assign the undefined to the refreshToken
+    //* delete all the cookies form the user.
+
+    const userDetails = req.user;
+    console.log("User Deatils", userDetails)
+    const user = await User.findByIdAndUpdate(userDetails._id, {
+        $set: {
+            refreshToken: undefined
+        }
+    },
+        {
+            new: true
+        }
+
+    )
+    const options = {
+        httpOnly: true,
+        secure: true
+    };
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(new ApiResponse(201,{},"Logout successfull"));
+})
+export {
+    registerUser,
+    loginUser,
+    logoutUser
+};

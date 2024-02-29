@@ -3,6 +3,9 @@ import { User } from "../models/sanptube/user.model.js";
 import { ApiError } from "../utils/ApiError.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
+import jwt from "jsonwebtoken"
+
+
 // here doesn't matter you use return keyword or not.
 const registerUser = asyncHandler(async (req, res) => {
     const { fullName, email, password, username } = req.body;
@@ -60,7 +63,6 @@ const registerUser = asyncHandler(async (req, res) => {
         new ApiResponse(200, userSavedDetails, "User registered sucessfully")
     )
 })
-
 
 const loginUser = asyncHandler(async (req, res) => {
     // todos:
@@ -152,8 +154,49 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken",options)
     .json(new ApiResponse(201,{},"Logout successfull"));
 })
+
+const refreshAccessToken=asyncHandler(async(req,res)=>{
+    // todos
+    //*if refresh token is there than generate new access token
+    //* check if the token is same as db refresh token
+    //* then send it to the user in the form of cookies
+    
+    let refreshToken=req.cookies?.refreshToken || req.body?.refreshToken
+
+    if(!refreshToken){
+        throw new ApiError(408,"Login again. Your session has expired. or refresh token is expired");
+    }
+    const options={
+        httpOnly:true,
+        secure:true
+    }
+    // console.log("Refresh Token===>>>>",refreshToken);
+    const decodedToken=await jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,options);
+    const userDetails=await User.findById(decodedToken?._id);
+    // console.log("userDetails",userDetails);
+    if(refreshToken!=userDetails.refreshToken){
+        throw new ApiError(403,"Invalid Token or expired")
+    }
+    const accessToken = await userDetails.generateAccessToken();
+     refreshToken = await userDetails.generateRefreshToken();
+     userDetails.refreshToken=refreshToken
+     const savedUser=await userDetails.save()
+    //  console.log("Saved user ",savedUser)
+    //  console.log("Before the res")
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(new ApiResponse(200,{accessToken:"New Access Token"},"Access Token Generated Successfully"))
+
+
+
+})
+
+
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    refreshAccessToken
 };

@@ -289,6 +289,26 @@ const updateUserAvatar=asyncHandler(async (req,res)=> {
 
     return res.status(201).json(new ApiResponse(201,savedUser,"Image updated successfully") )
 })
+
+const updateUserCoverImage=asyncHandler(async(req,res)=>{
+    //* main things is avatar image is a required field but cover image field is not.
+    const coverPath = req.files?.coverImage[0].path;
+    if(!coverPath){
+        throw new ApiError(400,'Please select an Image')
+    }
+    const newUrl=await uploadOnCloudinary(coverPath);
+    console.log("Cloudinary response : ",newUrl)
+    const user=await User.findById(req.user._id);
+    const oldurl=user.coverImage
+    if(oldurl!==null){
+        const deleteResponse=await deleteFromCloudinary(oldurl)
+        console.log('Delete from Cloudinary Response',deleteResponse)
+    }
+    user.coverImage=newUrl;
+    const savedUser=await user.save()
+
+    return res.status(201).json(new ApiResponse(201,savedUser,"Cover Image updated successfully") )
+})
 export {
     registerUser,
     loginUser,
@@ -297,12 +317,12 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     updateAccountDetails,
-    updateUserAvatar
+    updateUserAvatar,
+    updateUserCoverImage
 };
 
 // export {
 //  remaining controllers
-//     updateUserCoverImage,
 //     getUserChannelProfile,
 //     getWatchHistory
 // }

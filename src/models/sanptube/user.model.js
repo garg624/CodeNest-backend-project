@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
-
+    // this code will run  only when user modifies his/her password otherwise it won't run
     this.password =await bcrypt.hash(this.password, 10);// ? here is the salt or we can say that the number of rounds to encrypt the password.
     next();
 })

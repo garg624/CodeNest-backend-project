@@ -27,7 +27,7 @@ export const verifyAndExtractDataFromJWTToken=asyncHandler(async(req,res,next)=>
         if(!userDetails){
             throw new ApiError(404,"User not found or the access token is invalid");
         }
-    
+        //? adding the user info for the further use.
         req.user=userDetails;
         //! its important otherwise the control will not be passed to the next operation or middleware
         next()

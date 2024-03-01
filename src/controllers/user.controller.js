@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/sanptube/user.model.js";
 import { ApiError } from "../utils/ApiError.js"
-import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 
@@ -193,10 +193,116 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
 
 })
 
+const changeCurrentPassword=asyncHandler(async(req,res)=>{
+    //todos
+    //? bcz of the auth middleware we now have the user details req.user
+    //? in the req.body we have the old and new password
+    //? if both are same return error
+    //? exrtract the user _id from the req.user
+    //? check if the old password is correct by the user.isPassordCorrect
+    //?if correct the user.password to be changed to new password . [pre method middleware of the model willl take care]
+    //? save the user
+    //? return the api response to the client.
 
+    const {oldpassword,newpassword}=req.body;
+    // check if both the passwords are correct by the way this work is of the client side but I am doing this.
+    if(newpassword === oldpassword){
+        throw new ApiError(400,"New password cannot be same as Old Password.")
+    }
+    // checking the user old password is correct or not.
+    const user=await User.findById(req.user._id).select({password:1});
+    const isValid=await user.isPasswordCorrect(oldpassword)
+    if(!isValid){
+        throw new ApiError(400,'Old Password is incorrect')
+    }
+    // only password will be received
+    user.password=newpassword;
+    await user.save();
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200,{},"Password has been updated successfully"))
+
+
+
+})
+
+const getCurrentUser=asyncHandler(async (req,res)=>{
+    //todos
+    //*req.user which contains the logged-in user data
+    //* check if the user has 
+    //*get the data from the user except the password and the refresh token 
+    //*send the userDetails to the client side
+    
+    const user=await User.findById(req.user._id).select({password:0,refreshToken:0});
+    // console.log("user : ",user);
+    if(user===null){
+        throw new ApiError(404,"user not found");
+    }
+    return res
+    .status(200)
+    .json(new ApiResponse(201,user,"Successfully got the details of current user"));
+})
+
+const updateAccountDetails=asyncHandler( async (req,res)=>{
+    const {email,fullName}=req.body;
+    if(!email && !fullName){
+        throw new ApiError(400,"Fill the details");
+    }
+    const user=await User.findByIdAndUpdate(
+        req.user._id ,
+        {
+            $set:{
+                email:email,
+                fullName:fullName
+            }
+        },
+        {new:true}
+        ).select({password:0,refreshToken:0});
+    if(!user){
+        throw new ApiError(404,"User Not Found")
+    }
+
+    return  res.status(200).json(new ApiResponse(200,user,"Updated Successfully"))
+
+
+})
+
+const updateUserAvatar=asyncHandler(async (req,res)=> {
+    //todos
+    // get the new image .   
+    // delete old one.
+    //update db with new image url.
+    //req.user has the id
+    const avatarPath = req.files?.avatar[0].path;
+    if(!avatarPath){
+        throw new ApiError(400,'Please select an Image')
+    }
+    const newUrl=await uploadOnCloudinary(avatarPath);
+    console.log("Cloudinary response : ",newUrl)
+    const user=await User.findById(req.user._id);
+    const oldurl=user.avatar
+    const deleteResponse=await deleteFromCloudinary(oldurl)
+    console.log('Delete from Cloudinary Response',deleteResponse)
+    user.avatar=newUrl;
+    const savedUser=await user.save()
+
+    return res.status(201).json(new ApiResponse(201,savedUser,"Image updated successfully") )
+})
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails,
+    updateUserAvatar
 };
+
+// export {
+//  remaining controllers
+//     updateUserCoverImage,
+//     getUserChannelProfile,
+//     getWatchHistory
+// }

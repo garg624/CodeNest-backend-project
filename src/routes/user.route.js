@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { changeCurrentPassword, getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails ,updateUserAvatar , updateUserCoverImage } from "../controllers/user.controller.js";
+import { changeCurrentPassword, getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile, getWatchHistory } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyAndExtractDataFromJWTToken } from "../middlewares/auth.middleware.js";
 
@@ -27,16 +27,26 @@ router.route("/refreshAccessToken").post(refreshAccessToken);
 
 router.route("/changeCurrentPassword").post(verifyAndExtractDataFromJWTToken, changeCurrentPassword);
 
-router.route("/getCurrentUser").post(verifyAndExtractDataFromJWTToken, getCurrentUser);
+router.route("/getCurrentUser").get(verifyAndExtractDataFromJWTToken, getCurrentUser);
 
-router.route("/updateAccountDetails").post(verifyAndExtractDataFromJWTToken, updateAccountDetails);
+router.route("/updateAccountDetails").patch(verifyAndExtractDataFromJWTToken, updateAccountDetails);
 
-router.route("/updateUserAvatar").post(upload.fields([{
+router.route("/updateUserAvatar").patch(upload.fields([{
     name: "avatar",
     maxCount: 1
-}]),verifyAndExtractDataFromJWTToken, updateUserAvatar);
-router.route("/updateUserCoverImage").post(upload.fields([{
+}]), verifyAndExtractDataFromJWTToken, updateUserAvatar);
+
+
+router.route("/updateUserCoverImage").patch(upload.fields([{
     name: "coverImage",
     maxCount: 1
-}]),verifyAndExtractDataFromJWTToken, updateUserCoverImage);
+}]), verifyAndExtractDataFromJWTToken, updateUserCoverImage);
+
+router.route("/getUserChannelProfile/:username").get(verifyAndExtractDataFromJWTToken, getUserChannelProfile);
+
+
+router.route("/getWatchHistory").get(verifyAndExtractDataFromJWTToken, getWatchHistory);
+
+
+
 export default router

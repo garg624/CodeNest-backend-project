@@ -5,7 +5,7 @@ const tweetSchema=new mongoose.Schema({
         type:mongoose.Types.ObjectId,
         ref:"User"
     },
-    img:{
+    image:{
         // currently single image feature 
         // with cloudinary
         type:String

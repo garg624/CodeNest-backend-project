@@ -30,9 +30,12 @@ app.use(cookieParser());
 //? all the route are handled here.
 
 import userRouter from "./routes/user.route.js"
+import tweetRouter from "./routes/tweet.route.js"
+import videoRouter from "./routes/video.route.js"
+
 
 app.use("/api/v1/users",userRouter);
-
-
+app.use("/api/v1/tweet",tweetRouter)
+app.use("/api/v1/video",videoRouter)
 
 export {app}

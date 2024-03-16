@@ -39,9 +39,9 @@ const registerUser = asyncHandler(async (req, res) => {
     //now uplaod the image on cloudinary
     const avatarUrl = await uploadOnCloudinary(avatarPath);
     const coverImageUrl = await uploadOnCloudinary(coverImagePath)
-    console.log("Avatar url :", avatarUrl, " CoverImage url :", coverImageUrl);
+    // console.log("Avatar url :", avatarUrl, " CoverImage url :", coverImageUrl);
     //? check again if we have recieved the avatar url or not bcz its required in the db.
-    if (!avatarUrl) {
+    if (!avatarUrl.url) {
         throw new ApiError(400, 'Avatar is required');
     }
     // now validation is complete
@@ -51,8 +51,8 @@ const registerUser = asyncHandler(async (req, res) => {
             username,
             password,
             fullName,
-            avatar: avatarUrl,
-            coverImage: coverImageUrl || ""
+            avatar: avatarUrl.url,
+            coverImage: coverImageUrl.url || ""
         })
 
     // now show some info to the user the saved details.
@@ -281,12 +281,12 @@ const updateUserAvatar=asyncHandler(async (req,res)=> {
         throw new ApiError(400,'Please select an Image')
     }
     const newUrl=await uploadOnCloudinary(avatarPath);
-    console.log("Cloudinary response : ",newUrl)
+    console.log("Cloudinary response : ",newUrl.url)
     const user=await User.findById(req.user._id);
     const oldurl=user.avatar
     const deleteResponse=await deleteFromCloudinary(oldurl)
     console.log('Delete from Cloudinary Response',deleteResponse)
-    user.avatar=newUrl;
+    user.avatar=newUrl.url;
     const savedUser=await user.save()
 
     return res.status(201).json(new ApiResponse(201,savedUser,"Image updated successfully") )
@@ -299,14 +299,14 @@ const updateUserCoverImage=asyncHandler(async(req,res)=>{
         throw new ApiError(400,'Please select an Image')
     }
     const newUrl=await uploadOnCloudinary(coverPath);
-    console.log("Cloudinary response : ",newUrl)
+    console.log("Cloudinary response : ",newUrl.url)
     const user=await User.findById(req.user._id);
     const oldurl=user.coverImage
     if(oldurl!==null){
         const deleteResponse=await deleteFromCloudinary(oldurl)
         console.log('Delete from Cloudinary Response',deleteResponse)
     }
-    user.coverImage=newUrl;
+    user.coverImage=newUrl.url;
     const savedUser=await user.save()
 
     return res.status(201).json(new ApiResponse(201,savedUser,"Cover Image updated successfully") )

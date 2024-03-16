@@ -16,7 +16,7 @@ async function uploadOnCloudinary(filepath) {
         console.log("File successfully uploaded from cloudinary ", response)
         fs.unlinkSync(filepath);
         //returning the cloudinary url where the file is stored.
-        return response.url;
+        return response;
     } catch (error) {
         // it will remove the file from the temporary folder.
         fs.unlinkSync(filepath);
